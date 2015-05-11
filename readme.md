@@ -21,6 +21,12 @@ $ node index.js
 All tests are located inside the diretory `test`. They are written using [mocha](https://www.npmjs.com/package/mocha) and [chai](https://www.npmjs.com/package/chai). To run them enter
 
 ```
+$ npm test-server
+```
+
+and in another terminal
+
+```
 $ npm test
 ```
 
