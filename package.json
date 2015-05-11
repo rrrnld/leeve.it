@@ -1,0 +1,24 @@
+{
+  "name": "breadcrumbs-api",
+  "version": "0.0.1",
+  "description": "The backend powering breadcrumbs, a localized and secure messaging service",
+  "main": "index.js",
+  "scripts": {
+    "style-check": "./node_modules/.bin/standard",
+    "server": "node server.js",
+    "test-server": "NODE_ENV=test npm run server",
+    "test": "./node_modules/.bin/mocha --reporter spec"
+  },
+  "author": "Arne Schlüter <aesthaddicts@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "^2.2.0",
+    "mocha": "^2.2.4",
+    "request": "^2.55.0",
+    "standard": "^3.6.1"
+  },
+  "dependencies": {
+    "dotenv": "^1.1.0",
+    "express": "^4.12.3"
+  }
+}
