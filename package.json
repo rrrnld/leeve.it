@@ -1,24 +1,27 @@
 {
-  "name": "breadcrumbs-api",
+  "name": "leeves-api",
   "version": "0.0.1",
-  "description": "The backend powering breadcrumbs, a localized and secure messaging service",
+  "description": "The backend powering leeves.it, a localized and secure messaging service",
   "main": "index.js",
   "scripts": {
+    "start": "node server.js",
     "style-check": "./node_modules/.bin/standard",
-    "server": "node server.js",
-    "test-server": "NODE_ENV=test npm run server",
+    "test-server": "NODE_ENV=test npm start",
     "test": "./node_modules/.bin/mocha --reporter spec"
   },
   "author": "Arne Schlüter <aesthaddicts@gmail.com>",
   "license": "ISC",
   "devDependencies": {
     "chai": "^2.2.0",
+    "express-debug": "^1.1.1",
     "mocha": "^2.2.4",
     "request": "^2.55.0",
     "standard": "^3.6.1"
   },
   "dependencies": {
     "dotenv": "^1.1.0",
-    "express": "^4.12.3"
+    "express": "^4.12.3",
+    "mongoose": "^4.0.3",
+    "morgan": "^1.5.3"
   }
 }
