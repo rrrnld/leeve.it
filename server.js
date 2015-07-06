@@ -17,20 +17,31 @@ connection.on('error', function () {
   connection.close()
 })
 
-// load all controllers and mount them as API endpoints
+var jsFiles = function (fileName) {
+  // include only js files
+  return fileName.substr(-3) === '.js'
+}
+
+var onlyVisible = function (fileName) {
+  // exclude files starting with _ as a convenient way to quickly hide them
+  return fileName[0] !== '_'
+}
+
 connection.on('open', function () {
   var fs = require('fs')
+
+  // load all auth strategies
+  fs.readdirSync(__dirname + '/auth')
+    .filter(jsFiles)
+    .filter(onlyVisible)
+    .forEach(function (fileName) { require(__dirname + '/auth/' + fileName) })
+
+  // load all controllers and mount them as API endpoints
   fs.readdirSync(__dirname + '/controllers')
-    .filter(function (fileName) {
-      // include only js files
-      return fileName.substr(-3) === '.js'
-    })
-    .filter(function (fileName) {
-      // exclude files starting with _ as a convenient way to quickly unmount controllers
-      return fileName[0] !== '_'
-    })
+    .filter(jsFiles)
+    .filter(onlyVisible)
     .forEach(function (fileName) {
-      var controller = require('./controllers/' + fileName)
+      var controller = require(__dirname + '/controllers/' + fileName)
       var endPoint = '/' + fileName.substr(0, fileName.length - 3)
 
       console.log('Mounting controller at ' + endPoint)

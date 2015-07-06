@@ -12,6 +12,6 @@ var messageSchema = new mongoose.Schema({
   createdAt: Date,
   publishedAt: Date
 })
-messageSchema.index({ location: '2d' })
+messageSchema.index({ location: '2dsphere' })
 
 module.exports = mongoose.model('Message', messageSchema)

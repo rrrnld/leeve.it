@@ -6,7 +6,7 @@ var request = require('request')
 
 describe('Messages API', function () {
   it('should list no messages when there are none', function (done) {
-    request.get('http://localhost:8000/messages', function (err, res, body) {
+    request.get('http://localhost:8001/messages', function (err, res, body) {
       if (err) {
         done(err)
         return
@@ -21,7 +21,16 @@ describe('Messages API', function () {
     })
   })
 
-  it('should expect a sender, a receiver and an encrypted body when leaving messages')
+  it('should decline messages without a sender', function () {
+    var message = {
+      "message":
+    }
+  })
 
-  it('should list all messages for a specific person')
+  it('should only accept numeric senders and answer with an explanation if something goes wrong')
+  it('should decline messages without a receiver')
+  it('should only accept numeric receivers and answer with an explanation if something goes wrong')
+  it.skip('should only accept PGP-encrypted messages with an explanatory text if something goes wrong', function () {
+
+  })
 })
