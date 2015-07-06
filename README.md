@@ -31,3 +31,16 @@ $ npm test
 ```
 
 Additionally this makes sure that all JS files pass the [JS standard coding style](https://github.com/feross/standard) in order to ensure consistent formatting of source code. To help with this there also is a [.editorconfig](http://editorconfig.org/) file located in the root of this project.
+
+## SSL / TLS
+
+This server should only be run with a secure connection. In order to provide the necessary certificate and private key when running the server, place it inside the `sslcert` folder with the name `server.key` and `server.crt` respectively. If you are running this from your `localhost` (e.g. for development purposes), you can create a self-signed certificate and a key using the following commands (assuming you are on a Mac, based on [this guide](http://www.akadia.com/services/ssh_test_certificate.html)):
+
+```
+$ cd sslcert
+$ openssl genrsa -out server.key 1024
+$ openssl req -new -key server.key -out server.csr
+$ openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+```
+
+The `sslcert` directory should contain the four files `server.crt`, `server.csr`, `server.key` and `server.key.org` afterwards.

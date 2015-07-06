@@ -58,9 +58,20 @@ connection.on('open', function () {
 
   // start the server when running the script directly
   if (!module.parent) {
-    app.listen(process.env.SERVER_PORT, function () {
-      console.log('Server started and listening on ' + process.env.SERVER_PORT)
-    })
+    var https = require('https')
+
+    try {
+      var privateKey = fs.readFileSync(__dirname + '/sslcert/server.key')
+      var certificate = fs.readFileSync(__dirname + '/sslcert/server.crt')
+    } catch (e) {
+      console.error('Please provide a private key and a certificate as key.pem and cert.pem inside the sslcert folder.')
+      process.exit(1)
+    }
+
+    https.createServer({ key: privateKey, cert: certificate }, app)
+      .listen(process.env.SERVER_PORT, function () {
+        console.log('Server started and listening on ' + process.env.SERVER_PORT)
+      })
   }
 })
 
