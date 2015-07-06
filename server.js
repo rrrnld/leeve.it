@@ -2,6 +2,7 @@
 
 require('./config')
 
+var passport = require('passport')
 var express = require('express')
 var app = express()
 
@@ -15,6 +16,15 @@ var connection = mongoose.connection
 connection.on('error', function () {
   console.error('Mongoose failed to connect', process.env.DATABASE_URL)
   connection.close()
+})
+
+// pre-config for identity management
+passport.serializeUser(function (user, done) {
+  done(null, user)
+})
+
+passport.deserializeUser(function (user, done) {
+  done(null, user)
 })
 
 var jsFiles = function (fileName) {
@@ -31,6 +41,9 @@ connection.on('open', function () {
   var fs = require('fs')
 
   // load all auth strategies
+  app.use(passport.initialize())
+  app.use(passport.session())
+
   fs.readdirSync(__dirname + '/auth')
     .filter(jsFiles)
     .filter(onlyVisible)

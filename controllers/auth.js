@@ -8,8 +8,8 @@ routes.get('/signin', function (req, res) {
   // providers; maybe it should also just be a JSON array or something?
 })
 
-routes.get('/google', passport.authenticate('google-openidconnect'))
-routes.get('/google/callback', passport.authenticate('google-openidconnect'), function (req, res) {
+routes.get('/google', passport.authenticate('google-openidconnect', { scope: ['email'] }))
+routes.get('/google/callback', passport.authenticate('google-openidconnect', { scope: ['email'] }), function (req, res) {
   // authentication successful
   res.redirect('/')
 })

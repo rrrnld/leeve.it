@@ -1,16 +1,36 @@
 'use strict'
 
 var mongoose = require('mongoose')
+var Schema = mongoose.Schema
 
 // TODO: Default values and validation
 
-var messageSchema = new mongoose.Schema({
-  from: Number,      // a hash of the sender's e-mail address
-  to: Number,        // a hash of the recipient's e-mail address
-  message: String,   // signed and PGP-encrypted message
-  location: [],      // latitude and longitude
-  createdAt: Date,
-  publishedAt: Date
+var messageSchema = new Schema({
+  from: {
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
+  },
+
+  to: {
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
+  },
+
+  // signed and PGP-encrypted message
+  message: {
+    type: String,
+    required: true
+  },
+
+  // latitude and longitude
+  location: [],
+
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
 })
 messageSchema.index({ location: '2dsphere' })
 
