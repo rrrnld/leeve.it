@@ -9,8 +9,8 @@ passport.use(new GoogleStrategy({
   callbackURL: 'https://localhost:8000/auth/google/callback',
   userInfoURL: 'https://www.googleapis.com/plus/v1/people/me'
 }, function googleAuthCallBack (ispAddress, identifier, profile, accessToken, refreshToken, done) {
-  console.log('Google Auth Response:')
-  console.dir(arguments)
+  // console.log('Google Auth Response:')
+  // console.dir(arguments)
 
   User
     .findOneAndUpdate({

@@ -11,16 +11,11 @@ var messages = {
  * @return undefined
  */
 function completeSigninProcess (req, res, next) {
-  if (!req.user) {
-    return next(new Error())
-  }
-
-  if (!req.user.keyIdentifier) {
-    return next(new Error())
-  }
-
-  if (!req.user.alias) {
-    return next(new Error())
+  if (!req.user.keyIdentifier || !req.user.alias) {
+    res.status(403)
+    res.json({
+      error: 'Please complete the sign in process by submitting an alias and a key identifier.'
+    })
   }
 
   next(null)
