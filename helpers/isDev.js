@@ -1,3 +1,5 @@
+'use strict'
+
 /**
  * @return {Boolean}  True if we're inside a development environment. If no
  *                    NODE_ENV is set "development" is assumed.

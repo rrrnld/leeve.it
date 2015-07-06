@@ -1,15 +1,29 @@
 'use strict'
 
-var Message = require('../models/message')
 var routes = require('express').Router()
-var passport = require('passport')
 
-routes.get('/me', passport.authenticate([
-  // all accepted authentication providers can be placed into this array
-  'google-openidconnect'
-]), function (req, res, next) {
+var authenticate = require('../helpers/authenticate')
+var Message = require('../models/message')
+
+routes.get('/received', authenticate, function (req, res, next) {
   Message
-    .find()
+    .find({
+      to: req.user._id
+    })
+    .exec()
+    .then(function (messages) {
+      res.json(messages)
+      next()
+    }, function (err) {
+      next(err)
+    })
+})
+
+routes.get('/sent', authenticate, function (req, res, next) {
+  Message
+    .find({
+      from: req.user._id
+    })
     .exec()
     .then(function (messages) {
       res.json(messages)

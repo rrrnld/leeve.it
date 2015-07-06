@@ -11,7 +11,7 @@ routes.get('/signin', function (req, res) {
 routes.get('/google', passport.authenticate('google-openidconnect', { scope: ['email'] }))
 routes.get('/google/callback', passport.authenticate('google-openidconnect', { scope: ['email'] }), function (req, res) {
   // authentication successful
-  res.redirect('/')
+  res.redirect('/users/me')
 })
 
 module.exports = routes
