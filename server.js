@@ -55,10 +55,11 @@ connection.on('open', function () {
     .filter(onlyVisible)
     .forEach(function (fileName) {
       var controller = require(__dirname + '/controllers/' + fileName)
-      var endPoint = '/' + fileName.substr(0, fileName.length - 3)
+      var endPoint = fileName.substr(0, fileName.length - 3)
+      var apiVersion = controller.apiVersion || 'v1'
 
-      console.log('Mounting controller at ' + endPoint)
-      app.use(endPoint, controller)
+      console.log('Mounting controller at /' + apiVersion + '/' + endPoint)
+      app.use('/' + apiVersion + '/' + endPoint, controller)
     })
 
   var logger = require('morgan')
