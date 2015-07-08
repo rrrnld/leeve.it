@@ -2,10 +2,10 @@
 
 var routes = require('express').Router()
 
-var authenticate = require('../helpers/authenticate')
+// var authenticate = require('../helpers/authenticate')
 var Message = require('../models/message')
 
-routes.get('/received', authenticate, function (req, res, next) {
+routes.get('/received', function (req, res, next) {
   Message
     .find({
       to: req.user._id
@@ -19,7 +19,7 @@ routes.get('/received', authenticate, function (req, res, next) {
     })
 })
 
-routes.get('/sent', authenticate, function (req, res, next) {
+routes.get('/sent', function (req, res, next) {
   Message
     .find({
       from: req.user._id

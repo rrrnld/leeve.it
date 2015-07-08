@@ -3,24 +3,25 @@
 var routes = require('express').Router()
 
 // var completeSignin = require('../helpers/completeSignin')
-var authenticate = require('../helpers/authenticate')
+// var authenticate = require('../helpers/authenticate')
+var User = require('../models/user')
 
-routes.get('/me', authenticate, function (req, res, next) {
+routes.get('/me', function (req, res, next) {
   // if we have an error, let's see if it comes from the completeSignIn middleware
-  // if (err) {
-  //   if (err.message === completeSignin.messages.noKeyIdentifier || err.message === completeSignin.messages.noAlias) {
-  //     res.status(500)
-  //     res.json({
-  //       status: 500,
-  //       error: err.message
-  //     })
-  //   }
+  return res.json({
+    user: req.user
+  })
+})
 
-  //   return next(err)
-  // }
-
-  // // no errors, everything successful, return the newest messages
-  // res.redirect('/messages/received')
+routes.post('/me', function (req, res, next) {
+  User.findOneAndUpdate({
+    _id: req.user._id
+  }, {
+    $set: {
+      alias: req.params.alias,
+      keyIdentifier: req.params.keyIdentifier
+    }
+  }, next)
 })
 
 module.exports = routes

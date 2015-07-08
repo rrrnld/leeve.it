@@ -1,20 +1,18 @@
 'use strict'
 
-require('./config')
+var config = require('./config')
 
 var passport = require('passport')
 var express = require('express')
 var app = express()
 
-var isDev = require('./helpers/isDev')
-
 // connect to the database
 var mongoose = require('mongoose')
-mongoose.connect(process.env.DATABASE_URL)
+mongoose.connect(config.DATABASE_URL)
 var connection = mongoose.connection
 
 connection.on('error', function () {
-  console.error('Mongoose failed to connect', process.env.DATABASE_URL)
+  console.error('Mongoose failed to connect', config.DATABASE_URL)
   connection.close()
 })
 
@@ -40,14 +38,17 @@ var onlyVisible = function (fileName) {
 connection.on('open', function () {
   var fs = require('fs')
 
-  // load all auth strategies
-  app.use(passport.initialize())
-  app.use(passport.session())
+  // load middleware
+  var logger = require('morgan')
+  app.use(logger('combined'))
 
-  fs.readdirSync(__dirname + '/auth')
-    .filter(jsFiles)
-    .filter(onlyVisible)
-    .forEach(function (fileName) { require(__dirname + '/auth/' + fileName) })
+  var bodyParser = require('body-parser')
+
+  // for parsing application/json:
+  app.use(bodyParser.json())
+  // for parsing application/x-www-form-urlencoded:
+  app.use(bodyParser.urlencoded({ extended: true }))
+  app.use(require('multer'))      // for parsing multipart form data
 
   // load all controllers and mount them as API endpoints
   fs.readdirSync(__dirname + '/controllers')
@@ -62,14 +63,6 @@ connection.on('open', function () {
       app.use('/' + apiVersion + '/' + endPoint, controller)
     })
 
-  var logger = require('morgan')
-  app.use(logger('combined'))
-
-  // debugging panel
-  if (isDev()) {
-    require('express-debug')(app)
-  }
-
   // start the server when running the script directly
   if (!module.parent) {
     var https = require('https')
@@ -83,8 +76,8 @@ connection.on('open', function () {
     }
 
     https.createServer({ key: privateKey, cert: certificate }, app)
-      .listen(process.env.SERVER_PORT, function () {
-        console.log('Server started and listening on ' + process.env.SERVER_PORT)
+      .listen(config.SERVER_PORT, function () {
+        console.log('Server started and listening on ' + config.SERVER_PORT)
       })
   }
 })

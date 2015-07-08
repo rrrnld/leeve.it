@@ -1,11 +1,18 @@
 'use strict'
 
-// load config as defined in .env file
-require('dotenv').load()
+var fs = require('fs')
 
-process.env.NODE_ENV = process.env.NODE_ENV || 'production'
+// load config as defined in .env file
+var config = require('dotenv').parse(fs.readFileSync('.env'))
+
+// there can be multipe registered clients, so make it an array
+config.AUTH_GOOGLE_CLIENT_ID = config.AUTH_GOOGLE_CLIENT_ID.split(',')
+
+config.NODE_ENV = config.NODE_ENV || 'production'
 
 // make some additional adjustments when running tests
-if (process.env.NODE_ENV.toLowerCase() === 'test') {
-  process.env.SERVER_PORT = process.env.TEST_PORT
+if (config.NODE_ENV.toLowerCase() === 'test') {
+  config.SERVER_PORT = config.TEST_PORT
 }
+
+module.exports = config

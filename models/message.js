@@ -25,7 +25,10 @@ var messageSchema = new Schema({
   },
 
   // latitude and longitude
-  location: [],
+  location: {
+    type: [Number],
+    required: true
+  },
 
   createdAt: {
     type: Date,
