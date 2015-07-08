@@ -2,7 +2,6 @@
 
 var config = require('./config')
 
-var passport = require('passport')
 var express = require('express')
 var app = express()
 
@@ -14,15 +13,6 @@ var connection = mongoose.connection
 connection.on('error', function () {
   console.error('Mongoose failed to connect', config.DATABASE_URL)
   connection.close()
-})
-
-// pre-config for identity management
-passport.serializeUser(function (user, done) {
-  done(null, user)
-})
-
-passport.deserializeUser(function (user, done) {
-  done(null, user)
 })
 
 var jsFiles = function (fileName) {
@@ -46,9 +36,8 @@ connection.on('open', function () {
 
   // for parsing application/json:
   app.use(bodyParser.json())
-  // for parsing application/x-www-form-urlencoded:
+  // // for parsing application/x-www-form-urlencoded:
   app.use(bodyParser.urlencoded({ extended: true }))
-  app.use(require('multer'))      // for parsing multipart form data
 
   // load all controllers and mount them as API endpoints
   fs.readdirSync(__dirname + '/controllers')
@@ -59,8 +48,10 @@ connection.on('open', function () {
       var endPoint = fileName.substr(0, fileName.length - 3)
       var apiVersion = controller.apiVersion || 'v1'
 
-      console.log('Mounting controller at /' + apiVersion + '/' + endPoint)
-      app.use('/' + apiVersion + '/' + endPoint, controller)
+      var uri = '/' + apiVersion + '/' + endPoint
+
+      console.log('Mounting controller at ' + uri)
+      app.use(uri, controller)
     })
 
   // start the server when running the script directly
@@ -80,6 +71,15 @@ connection.on('open', function () {
         console.log('Server started and listening on ' + config.SERVER_PORT)
       })
   }
+
+  app.get('hello', function (req, res, next) {
+    res.send('without slash')
+    next()
+  })
+  app.get('/hello', function (req, res, next) {
+    res.send('with slash')
+    next()
+  })
 })
 
 module.exports = app

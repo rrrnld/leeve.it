@@ -6,7 +6,7 @@ var fs = require('fs')
 var config = require('dotenv').parse(fs.readFileSync('.env'))
 
 // there can be multipe registered clients, so make it an array
-config.AUTH_GOOGLE_CLIENT_ID = config.AUTH_GOOGLE_CLIENT_ID.split(',')
+config.AUTH_GOOGLE_CLIENT_IDS = config.AUTH_GOOGLE_CLIENT_IDS.split(',')
 
 config.NODE_ENV = config.NODE_ENV || 'production'
 
