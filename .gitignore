@@ -1,3 +1,6 @@
 node_modules/
 npm-debug.log
 .env
+
+# The key files are retrieved automatically by the modules inside ./openid
+.keys.*.json

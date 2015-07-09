@@ -5,6 +5,12 @@ var config = require('./config')
 var express = require('express')
 var app = express()
 
+// retrieve keys for JWT validation
+var googleKeys = require('./openid/google')
+googleKeys.retrieve(function (path) {
+  console.log('Retrieved google keys and saved them at ' + path)
+})
+
 // connect to the database
 var mongoose = require('mongoose')
 mongoose.connect(config.DATABASE_URL)
