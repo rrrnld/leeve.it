@@ -2,26 +2,20 @@
 
 var routes = require('express').Router()
 
-// var completeSignin = require('../helpers/completeSignin')
-// var authenticate = require('../helpers/authenticate')
-var User = require('../models/user')
+var requireLogin = require('../helpers/require-login')
 
-routes.get('/me', function (req, res, next) {
-  // if we have an error, let's see if it comes from the completeSignIn middleware
+routes.get('/me', requireLogin, function (req, res, next) {
   return res.json({
     user: req.user
   })
 })
 
-routes.post('/me', function (req, res, next) {
-  User.findOneAndUpdate({
-    _id: req.user._id
-  }, {
-    $set: {
-      alias: req.params.alias,
-      keyIdentifier: req.params.keyIdentifier
-    }
-  }, next)
+routes.post('/me', requireLogin, function (req, res, next) {
+  var user = req.user
+
+  user.alias = req.params.alias
+  user.keyIdentifier = req.params.keyIdentifier
+  user.save(next)
 })
 
 module.exports = routes

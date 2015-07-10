@@ -39,6 +39,17 @@ connection.on('open', function () {
   // // for parsing application/x-www-form-urlencoded:
   app.use(bodyParser.urlencoded({ extended: true }))
 
+  // setup sessions
+  var session = require('express-session')
+  var MongoStore = require('connect-mongo')(session)
+
+  app.use(session({
+    secret: config.SESSION_SECRET,
+    saveUninitialized: false, // don't create session until something stored
+    resave: false, // don't save session if unmodified
+    store: new MongoStore({ mongooseConnection: connection })
+  }))
+
   if (app.get('env') === 'development') {
     console.log('In development mode')
     console.log('Setting Access-Control-Allow headers')
