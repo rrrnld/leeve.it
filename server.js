@@ -47,24 +47,20 @@ connection.on('open', function () {
     secret: config.SESSION_SECRET,
     saveUninitialized: false, // don't create session until something stored
     resave: false, // don't save session if unmodified
-    store: new MongoStore({ mongooseConnection: connection })
+    store: new MongoStore({ mongooseConnection: connection }),
+
+    httpOnly: false, // available in document.cookies
+    secure: true // only sent over https
   }))
 
-  if (app.get('env') === 'development') {
-    console.log('In development mode')
-    console.log('Setting Access-Control-Allow headers')
+  console.log('Setting Access-Control-Allow headers')
+  app.use(function accessControlHeader (req, res, next) {
+    res.append('Access-Control-Allow-Origin', config.ACCESS_CONTROL_ALLOW_ORIGIN)
+    res.append('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+    res.append('Access-Control-Allow-Credentials', true)
 
-    app.use(function accessControlHeader (req, res, next) {
-      if (res.headersSent) {
-        console.error('Headers have already been sent, can not set access-control-allow-origin')
-      } else {
-        res.append('Access-Control-Allow-Origin', '*')
-        res.append('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
-      }
-
-      next()
-    })
-  }
+    next()
+  })
 
   // load all controllers and mount them as API endpoints
   fs.readdirSync(__dirname + '/controllers')

@@ -10,11 +10,13 @@ var fetchUser = require('./fetch-user.js')
 module.exports = function requireLogin (req, res, next) {
   fetchUser(req, res, function () {
     if (!req.user) {
-      res.status(401)
-      res.json({
-        message: 'Not logged in'
-      })
-      return next()
+      return res
+        .status(401)
+        .json({
+          message: 'Not logged in'
+        })
     }
+
+    next()
   })
 }

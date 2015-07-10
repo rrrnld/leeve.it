@@ -1,5 +1,7 @@
 'use strict'
 
+var debug = require('debug')('auth')
+
 var jwt = require('green-jwt')
 var routes = require('express').Router()
 // var passport = require('passport')
@@ -31,7 +33,7 @@ routes.post('/google/verify', function verifyGoogleAuth (req, res, next) {
     res.json({
       message: errors.badProtocol
     })
-    console.log('Error: ', errors.badProtocol)
+    console.error('Error: ', errors.badProtocol)
     return next()
   }
 
@@ -41,7 +43,7 @@ routes.post('/google/verify', function verifyGoogleAuth (req, res, next) {
     res.json({
       message: errors.noToken
     })
-    console.log('Error: ', errors.noToken)
+    console.error('Error: ', errors.noToken)
     return next()
   }
 
@@ -58,7 +60,7 @@ routes.post('/google/verify', function verifyGoogleAuth (req, res, next) {
     res.json({
       message: errors.invalidClientID
     })
-    console.log('Error: ', errors.invalidClientID)
+    console.error('Error: ', errors.invalidClientID)
     return next()
   }
 
@@ -67,7 +69,7 @@ routes.post('/google/verify', function verifyGoogleAuth (req, res, next) {
     res.json({
       message: errors.invalidIss
     })
-    console.log('Error: ', errors.invalidIss)
+    console.error('Error: ', errors.invalidIss)
     return next()
   }
 
@@ -77,7 +79,7 @@ routes.post('/google/verify', function verifyGoogleAuth (req, res, next) {
     res.json({
       message: errors.tokenExpired
     })
-    console.log('Error: ', errors.tokenExpired, 'Expiration: ' + claim.exp + ', now: ' + Date.now())
+    console.error('Error: ', errors.tokenExpired, 'Expiration: ' + claim.exp + ', now: ' + Date.now())
     return next()
   }
 
@@ -89,37 +91,38 @@ routes.post('/google/verify', function verifyGoogleAuth (req, res, next) {
     // if we found a user, just update the identity token and initialize the
     // session
     if (user) {
-      console.log('User logged in again', JSON.stringify(user))
+      debug('User logged in again', JSON.stringify(user))
       user.idToken = claim
       user.save(function (err) {
+        debug('Updated ID token')
         if (err) {
           console.error(err.name, err.message)
           return next(err)
         }
 
         req.session.userId = user._id
-        next()
+        debug('Session set', req.session)
+        res.end()
       })
-      return
+    } else {
+      // if not, create the new User
+      user = new User({
+        idToken: claim,
+
+        keyIdentifier: claim.email,
+        alias: claim.name,
+        picture: claim.picture
+      }).save(function (err) {
+        if (err) {
+          console.error(err.name, err.message)
+          return next(err)
+        }
+
+        debug('Created user', JSON.stringify(user))
+        req.session.userId = user._id
+        res.end()
+      })
     }
-
-    // if not, create the new User
-    user = new User({
-      idToken: claim,
-
-      keyIdentifier: claim.email,
-      alias: claim.name,
-      picture: claim.picture
-    }).save(function (err) {
-      if (err) {
-        console.error(err.name, err.message)
-        return next(err)
-      }
-
-      console.log('Created user', JSON.stringify(user))
-      req.session.userId = user._id
-      next()
-    })
   })
 })
 
