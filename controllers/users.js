@@ -1,10 +1,12 @@
 'use strict'
 
+var debug = require('debug')('users')
 var routes = require('express').Router()
 
 var requireLogin = require('../helpers/require-login')
 
 routes.get('/me', requireLogin, function (req, res, next) {
+  debug('Session:', req.session)
   return res.json({
     user: req.user
   })

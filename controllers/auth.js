@@ -91,7 +91,7 @@ routes.post('/google/verify', function verifyGoogleAuth (req, res, next) {
     // if we found a user, just update the identity token and initialize the
     // session
     if (user) {
-      debug('User logged in again', JSON.stringify(user))
+      debug('User logged in again')
       user.idToken = claim
       user.save(function (err) {
         debug('Updated ID token')
@@ -118,7 +118,7 @@ routes.post('/google/verify', function verifyGoogleAuth (req, res, next) {
           return next(err)
         }
 
-        debug('Created user', JSON.stringify(user))
+        debug('Created user')
         req.session.userId = user._id
         res.end()
       })

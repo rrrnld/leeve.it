@@ -1,3 +1,4 @@
+var debug = require('debug')('users')
 var User = require('../models/user')
 
 /**
@@ -11,6 +12,8 @@ module.exports = function fetchUserFromSession (req, res, next) {
   if (!req.session) return next()
 
   User.findById(req.session.userId, function (err, user) {
+    debug('User with id ' + req.session.userId + ':', user)
+
     if (err) return next(err)
 
     req.user = user

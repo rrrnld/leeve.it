@@ -49,8 +49,11 @@ connection.on('open', function () {
     resave: false, // don't save session if unmodified
     store: new MongoStore({ mongooseConnection: connection }),
 
-    httpOnly: false, // available in document.cookies
-    secure: true // only sent over https
+    cookie: {
+      httpOnly: false, // available in document.cookies
+      secure: true, // only sent over https
+      maxAge: null // session cookie, gets deleted when the browser window closes
+    }
   }))
 
   console.log('Setting Access-Control-Allow headers')
