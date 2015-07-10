@@ -5,12 +5,6 @@ var config = require('./config')
 var express = require('express')
 var app = express()
 
-// retrieve keys for JWT validation
-var googleKeys = require('./openid/google')
-googleKeys.retrieve(function (path) {
-  console.log('Retrieved google keys and saved them at ' + path)
-})
-
 // connect to the database
 var mongoose = require('mongoose')
 mongoose.connect(config.DATABASE_URL)
@@ -45,6 +39,22 @@ connection.on('open', function () {
   // // for parsing application/x-www-form-urlencoded:
   app.use(bodyParser.urlencoded({ extended: true }))
 
+  if (app.get('env') === 'development') {
+    console.log('In development mode')
+    console.log('Setting Access-Control-Allow headers')
+
+    app.use(function accessControlHeader (req, res, next) {
+      if (res.headersSent) {
+        console.error('Headers have already been sent, can not set access-control-allow-origin')
+      } else {
+        res.append('Access-Control-Allow-Origin', '*')
+        res.append('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept')
+      }
+
+      next()
+    })
+  }
+
   // load all controllers and mount them as API endpoints
   fs.readdirSync(__dirname + '/controllers')
     .filter(jsFiles)
@@ -77,15 +87,6 @@ connection.on('open', function () {
         console.log('Server started and listening on ' + config.SERVER_PORT)
       })
   }
-
-  app.get('hello', function (req, res, next) {
-    res.send('without slash')
-    next()
-  })
-  app.get('/hello', function (req, res, next) {
-    res.send('with slash')
-    next()
-  })
 })
 
 module.exports = app

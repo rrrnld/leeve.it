@@ -9,7 +9,7 @@ var config = require('../config')
 
 var errors = {
   badProtocol: 'Please send the request over a TLS connection',
-  noToken: 'No id_token supplied',
+  noToken: 'Missing paramteter `idtoken`',
   invalidClientID: 'Token has been obtained by an invalid client',
   invalidIss: 'The iss must either be accounts.google.com or https://accounts.google.com',
   tokenExpired: 'The expiration date has already been passed'
