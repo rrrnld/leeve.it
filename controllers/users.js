@@ -7,9 +7,7 @@ var requireLogin = require('../helpers/require-login')
 
 routes.get('/me', requireLogin, function (req, res, next) {
   debug('Session:', req.session)
-  return res.json({
-    user: req.user
-  })
+  return res.json(req.user)
 })
 
 routes.post('/me', requireLogin, function (req, res, next) {
