@@ -3,7 +3,7 @@
 var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 
-var messageSchema = new Schema({
+var conversationSchema = new Schema({
 
   to: {
     type: Schema.ObjectId,
@@ -11,10 +11,17 @@ var messageSchema = new Schema({
     required: true
   },
 
+  // This is used to build up the communication chain; if it is null, we're
+  // at the start of a conversation
+  answerTo: {
+    type: Schema.ObjectId,
+    ref: 'Conversation'
+  },
+
   // signed and PGP-encrypted message
   // TODO: Validate encryption
   content: {
-    type: String,
+    type: [String],
     required: true
   },
 
@@ -29,6 +36,6 @@ var messageSchema = new Schema({
     default: Date.now
   }
 })
-messageSchema.index({ location: '2dsphere' })
+conversationSchema.index({ location: '2dsphere' })
 
-module.exports = mongoose.model('Message', messageSchema)
+module.exports = mongoose.model('Conversation', conversationSchema)

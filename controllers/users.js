@@ -10,7 +10,7 @@ routes.get('/me', requireLogin, function (req, res, next) {
   return res.json(req.user)
 })
 
-routes.post('/me', requireLogin, function (req, res, next) {
+routes.put('/me', requireLogin, function (req, res, next) {
   var user = req.user
 
   user.alias = req.params.alias

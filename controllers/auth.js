@@ -85,7 +85,10 @@ routes.post('/google/verify', function verifyGoogleAuth (req, res, next) {
 
   // authentication successful
   claim._type = 'google'
-  User.findOne({ 'idToken.email': claim.email }, function (err, user) {
+  User.findOne({
+    'idToken.email': claim.email,
+    'idToken._type': claim._type
+  }, function (err, user) {
     if (err) return next(err)
 
     // if we found a user, just update the identity token and initialize the
