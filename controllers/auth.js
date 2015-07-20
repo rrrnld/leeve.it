@@ -18,33 +18,26 @@ var errors = {
   tokenExpired: 'The expiration date has already been passed'
 }
 
-// this route provides information about the supported identity providers
-routes.get('/providers', function (req, res) {
-  res.json([ 'google-openid-connect' ])
-})
-
 // this accepts an id json web token provided by the google auth client lib.
 // information on how to verify can be found on the following page:
 // https://developers.google.com/identity/sign-in/web/backend-auth#verify-the-integrity-of-the-id-token
 routes.post('/google/verify', function verifyGoogleAuth (req, res, next) {
   // first do basic validation, is it the right protocol?
   if (req.protocol !== 'https') {
-    res.status(400)
-    res.json({
-      message: errors.badProtocol
-    })
     console.error('Error: ', errors.badProtocol)
-    return next()
+
+    return res
+      .status(400)
+      .json({ message: errors.badProtocol })
   }
 
   // has a token been sent?
   if (!req.body.idtoken) {
-    res.status(400)
-    res.json({
-      message: errors.noToken
-    })
     console.error('Error: ', errors.noToken)
-    return next()
+
+    return res
+      .status(400)
+      .json({ message: errors.noToken })
   }
 
   var idToken = jwt.decode(req.body.idtoken)
@@ -84,16 +77,17 @@ routes.post('/google/verify', function verifyGoogleAuth (req, res, next) {
   }
 
   // authentication successful
-  claim._type = 'google'
+  var idProvider = 'google-openid-connect'
   User.findOne({
-    'idToken.email': claim.email,
-    'idToken._type': claim._type
+    'idToken.sub': claim.sub,
+    'idProvider': idProvider
   }, function (err, user) {
     if (err) return next(err)
 
-    // if we found a user, just update the identity token and initialize the
-    // session
     if (user) {
+      // if we found a user, just update the identity token and initialize the
+      // session
+
       debug('User logged in again')
       user.idToken = claim
       user.save(function (err) {
@@ -108,9 +102,10 @@ routes.post('/google/verify', function verifyGoogleAuth (req, res, next) {
         res.end()
       })
     } else {
-      // if not, create the new User
+      // if not, create the new User and fill in defaults from the ID token
       user = new User({
         idToken: claim,
+        idProvider: idProvider,
 
         keyIdentifier: claim.email,
         alias: claim.name,
