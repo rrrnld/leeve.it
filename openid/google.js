@@ -2,6 +2,13 @@ var https = require('https')
 var fs = require('fs')
 var jwk2pem = require('pem-jwk').jwk2pem
 
+/**
+ * This module is used to fetch google's JWK. As they are in JWK fomart, but need
+ * to be in PEM in order to be accepted by the `jsonwebtoken` module, they are
+ * also converted and saved to the file `.keys.google.json` afterwards.
+ *
+ * @module
+ */
 module.exports = {
 
   retrieve: function (done) {

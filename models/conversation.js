@@ -7,6 +7,12 @@ var isPGPencrypted = require('../helpers/is-pgp-encrypted')
 
 var conversationSchema = new Schema({
 
+  from: {
+    type: Schema.ObjectId,
+    ref: 'User',
+    required: true
+  },
+
   to: {
     type: Schema.ObjectId,
     ref: 'User',
@@ -21,7 +27,6 @@ var conversationSchema = new Schema({
   },
 
   // signed and PGP-encrypted message
-  // TODO: Validate encryption
   content: {
     type: [String],
     required: true
@@ -42,7 +47,7 @@ conversationSchema.index({ location: '2dsphere' })
 
 // custom validation: Make sure there are always two messages and that they are
 // both encrypted
-conversationSchema.pre('save', function (next) {
+conversationSchema.pre('save', function validateConversation (next) {
   var errors = {
     wrongMessageAmount: 'Content must contain two messages',
     notEncrypted: 'Content must contain messages encrypted as described in the OpenPGP standard'

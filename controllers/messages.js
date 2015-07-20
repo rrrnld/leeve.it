@@ -46,6 +46,8 @@ routes.get('/me', requireLogin, function (req, res, next) {
 })
 
 routes.get('/:id', requireLogin, function (req, res, next) {
+  if (req.params.id === 'me') return next()
+
   Message
     .findOne({
       _id: req.params.id,
