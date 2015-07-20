@@ -21,7 +21,6 @@ var mongoose = require('mongoose')
  * @type {Object}
  */
 var openidToken = {
-  _type: { type: String, required: true },
   iss: { type: String, required: true },
   sub: { type: String, required: true },
   azp: { type: String, required: true },
@@ -37,6 +36,12 @@ var openidToken = {
 
 var userSchema = new mongoose.Schema({
   idToken: openidToken,
+
+  idProvider: {
+    type: String,
+    enum: [ 'google-openid-connect' ],
+    required: true
+  },
 
   // this is received from the identity provider and used as an indicator on
   // which key identifier to get
