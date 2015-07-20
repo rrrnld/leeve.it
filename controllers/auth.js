@@ -4,8 +4,6 @@ var debug = require('debug')('auth')
 
 var jwt = require('green-jwt')
 var routes = require('express').Router()
-// var passport = require('passport')
-// var completeSignin = require('../helpers/completeSignin')
 
 var config = require('../config')
 var User = require('../models/user')
@@ -24,7 +22,7 @@ var errors = {
 routes.post('/google/verify', function verifyGoogleAuth (req, res, next) {
   // first do basic validation, is it the right protocol?
   if (req.protocol !== 'https') {
-    console.error('Error: ', errors.badProtocol)
+    debug('Error: ', errors.badProtocol)
 
     return res
       .status(400)
@@ -33,7 +31,7 @@ routes.post('/google/verify', function verifyGoogleAuth (req, res, next) {
 
   // has a token been sent?
   if (!req.body.idtoken) {
-    console.error('Error: ', errors.noToken)
+    debug('Error: ', errors.noToken)
 
     return res
       .status(400)
@@ -53,7 +51,7 @@ routes.post('/google/verify', function verifyGoogleAuth (req, res, next) {
     res.json({
       message: errors.invalidClientID
     })
-    console.error('Error: ', errors.invalidClientID)
+    debug('Error: ', errors.invalidClientID)
     return next()
   }
 
@@ -62,7 +60,7 @@ routes.post('/google/verify', function verifyGoogleAuth (req, res, next) {
     res.json({
       message: errors.invalidIss
     })
-    console.error('Error: ', errors.invalidIss)
+    debug('Error: ', errors.invalidIss)
     return next()
   }
 
@@ -72,7 +70,7 @@ routes.post('/google/verify', function verifyGoogleAuth (req, res, next) {
     res.json({
       message: errors.tokenExpired
     })
-    console.error('Error: ', errors.tokenExpired, 'Expiration: ' + claim.exp + ', now: ' + Date.now())
+    debug('Error: ', errors.tokenExpired, 'Expiration: ' + claim.exp + ', now: ' + Date.now())
     return next()
   }
 
@@ -93,7 +91,7 @@ routes.post('/google/verify', function verifyGoogleAuth (req, res, next) {
       user.save(function (err) {
         debug('Updated ID token')
         if (err) {
-          console.error(err.name, err.message)
+          debug(err.name, err.message)
           return next(err)
         }
 
@@ -112,7 +110,7 @@ routes.post('/google/verify', function verifyGoogleAuth (req, res, next) {
         picture: claim.picture
       }).save(function (err) {
         if (err) {
-          console.error(err.name, err.message)
+          debug(err.name, err.message)
           return next(err)
         }
 
