@@ -3,6 +3,8 @@
 var mongoose = require('mongoose')
 var Schema = mongoose.Schema
 
+var isPGPencrypted = require('../helpers/is-pgp-encrypted')
+
 var messageSchema = new Schema({
 
   to: {
@@ -30,5 +32,17 @@ var messageSchema = new Schema({
   }
 })
 messageSchema.index({ location: '2dsphere' })
+
+// custom validation: Make sure the message is encrypted
+messageSchema.pre('save', function (next) {
+  var errorMessage = 'Content must be encrypted as described in the OpenPGP standard'
+
+  if (!isPGPencrypted(this.content)) {
+    this.invalidate('content', errorMessage)
+    return next(new Error(errorMessage))
+  }
+
+  next()
+})
 
 module.exports = mongoose.model('Message', messageSchema)
