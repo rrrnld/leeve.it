@@ -14,7 +14,6 @@ var messageSchema = new Schema({
   },
 
   // signed and PGP-encrypted message
-  // TODO: Validate encryption
   content: {
     type: String,
     required: true
@@ -34,7 +33,7 @@ var messageSchema = new Schema({
 messageSchema.index({ location: '2dsphere' })
 
 // custom validation: Make sure the message is encrypted
-messageSchema.pre('save', function (next) {
+messageSchema.pre('save', function validateMessage (next) {
   var errorMessage = 'Content must be encrypted as described in the OpenPGP standard'
 
   if (!isPGPencrypted(this.content)) {
