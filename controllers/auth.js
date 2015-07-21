@@ -2,11 +2,14 @@
 
 var debug = require('debug')('auth')
 
-var jwt = require('green-jwt')
 var routes = require('express').Router()
 
 var config = require('../config')
 var User = require('../models/user')
+
+var GoogleAuth = require('google-auth-library')
+var googleAuth = new GoogleAuth()
+var googleOAuth2 = new googleAuth.OAuth2(config.AUTH_GOOGLE_CLIENT_IDS[0])
 
 var errors = {
   badProtocol: 'Please send the request over a TLS connection',
@@ -38,87 +41,62 @@ routes.post('/google/verify', function verifyGoogleAuth (req, res, next) {
       .json({ message: errors.noToken })
   }
 
-  var idToken = jwt.decode(req.body.idtoken)
-  console.log('idToken: ', idToken)
-  var claim = idToken.claim
-
   // Now as advised on the google page
-
-  // TODO: Verify that the ID token is a JWT that is properly signed with an appropriate Google public key.
-
-  if (config.AUTH_GOOGLE_CLIENT_IDS.indexOf(claim.aud) === -1) {
-    res.status(400)
-    res.json({
-      message: errors.invalidClientID
-    })
-    debug('Error: ', errors.invalidClientID)
-    return next()
-  }
-
-  if (['accounts.google.com', 'https://accounts.google.com'].indexOf(claim.iss) === -1) {
-    res.status(400)
-    res.json({
-      message: errors.invalidIss
-    })
-    debug('Error: ', errors.invalidIss)
-    return next()
-  }
-
-  // claim.exp is a string but it gets automatically casted by javascript
-  if (claim.exp * 1000 < Date.now()) {
-    res.status(400)
-    res.json({
-      message: errors.tokenExpired
-    })
-    debug('Error: ', errors.tokenExpired, 'Expiration: ' + claim.exp + ', now: ' + Date.now())
-    return next()
-  }
-
-  // authentication successful
-  var idProvider = 'google-openid-connect'
-  User.findOne({
-    'idToken.sub': claim.sub,
-    'idProvider': idProvider
-  }, function (err, user) {
-    if (err) return next(err)
-
-    if (user) {
-      // if we found a user, just update the identity token and initialize the
-      // session
-
-      debug('User logged in again')
-      user.idToken = claim
-      user.save(function (err) {
-        debug('Updated ID token')
-        if (err) {
-          debug(err.name, err.message)
-          return next(err)
-        }
-
-        req.session.userId = user._id
-        debug('Session set', req.session)
-        res.end()
-      })
-    } else {
-      // if not, create the new User and fill in defaults from the ID token
-      user = new User({
-        idToken: claim,
-        idProvider: idProvider,
-
-        keyIdentifier: claim.email,
-        alias: claim.name,
-        picture: claim.picture
-      }).save(function (err) {
-        if (err) {
-          debug(err.name, err.message)
-          return next(err)
-        }
-
-        debug('Created user')
-        req.session.userId = user._id
-        res.end()
-      })
+  googleOAuth2.verifyIdToken(req.body.idtoken, config.AUTH_GOOGLE_CLIENT_IDS[0], function idTokenVerified (err, login) {
+    if (err) {
+      debug('Could not verify ID token', err)
+      return next(err)
     }
+
+    debug('Verified identity token')
+    var claim = login.getPayload()
+
+    // authentication successful
+    var idProvider = 'google-openid-connect'
+    User.findOne({
+      'idToken.sub': claim.sub,
+      'idProvider': idProvider
+    }, function (err, user) {
+      if (err) return next(err)
+
+      if (user) {
+        // if we found a user, just update the identity token and initialize the
+        // session
+
+        debug('User logged in again')
+        user.idToken = claim
+        user.save(function (err) {
+          debug('Updated ID token')
+          if (err) {
+            debug(err.name, err.message)
+            return next(err)
+          }
+
+          req.session.userId = user._id
+          debug('Session set', req.session)
+          res.end()
+        })
+      } else {
+        // if not, create the new User and fill in defaults from the ID token
+        user = new User({
+          idToken: claim,
+          idProvider: idProvider,
+
+          keyIdentifier: claim.email,
+          alias: claim.name,
+          picture: claim.picture
+        }).save(function (err) {
+          if (err) {
+            debug(err.name, err.message)
+            return next(err)
+          }
+
+          debug('Created user')
+          req.session.userId = user._id
+          res.end()
+        })
+      }
+    })
   })
 })
 

@@ -1,7 +1,7 @@
 {
-  "name": "leeves-api",
+  "name": "leeve-api",
   "version": "0.0.1",
-  "description": "The backend powering leeves.it, a localized and secure messaging service",
+  "description": "The backend powering leeve.it, a localized and secure messaging service",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
@@ -25,9 +25,8 @@
     "dotenv": "^1.1.0",
     "express": "^4.12.3",
     "express-session": "^1.11.3",
-    "green-jwt": "0.0.8-alpha",
+    "google-auth-library": "^0.9.6",
     "mongoose": "^4.0.3",
-    "morgan": "^1.5.3",
-    "pem-jwk": "^1.5.1"
+    "morgan": "^1.5.3"
   }
 }
