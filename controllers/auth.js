@@ -7,9 +7,8 @@ var routes = require('express').Router()
 var config = require('../config')
 var User = require('../models/user')
 
-var GoogleAuth = require('google-auth-library')
-var googleAuth = new GoogleAuth()
-var googleOAuth2 = new googleAuth.OAuth2(config.AUTH_GOOGLE_CLIENT_IDS[0])
+var GoogleOAuth2 = require('google-auth-library/lib/auth/oauth2client')
+var googleOAuth2 = new GoogleOAuth2(config.AUTH_GOOGLE_CLIENT_IDS[0])
 
 var errors = {
   badProtocol: 'Please send the request over a TLS connection',
